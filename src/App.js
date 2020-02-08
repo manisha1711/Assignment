@@ -36,7 +36,9 @@ class App extends Component {
       "image_url": "http: //lorempixel.com/400/1000/people/"
       }],
       editImageUrl:'',
-      newImage:''
+      newImage:false,
+      newImageUrl:'',
+      editImageIndex:''
   }
   removeImage = (index) => {
     var currentList = [...this.state.list];
@@ -44,9 +46,31 @@ class App extends Component {
     this.setState({list: currentList});
   }
   editImage = (index) => {
+
     this.setState({editImageUrl: this.state.list[index].image_url,
-      newImage:false
+      newImage:false,
+      editImageIndex:index
     });
+  }
+  fileInput = (e) =>{
+    e.preventDefault();
+
+    let reader = new FileReader();
+    let file = e.target.files[0];
+
+    reader.onloadend = () => {
+      this.setState({
+        newImage:true,
+        newImageUrl: reader.result
+      });
+    }
+
+    reader.readAsDataURL(file)
+  }
+  saveImage = () => {
+    var currentList = [...this.state.list];
+    currentList[this.state.editImageIndex].image_url = this.state.newImageUrl;
+    this.setState({list: currentList});
   }
   render(){
     const {list} = this.state;
@@ -73,11 +97,11 @@ class App extends Component {
                         <div className="col-md-6">
                             <div className="marginB20">New Image</div>
                             <img  src="http://via.placeholder.com/150" alt="No img" className={this.state.newImage?"hide":''}/>
-                            <img className={!this.state.newImage?"hide":''}/>
-                            <form className="marginTB15"> 
-                            <input type="file"  className="choose-file"  />    
+                            <img src={this.state.newImageUrl} className={!this.state.newImage?"hide":''} alt='New img'/>
+                             <form className="marginTB15"> 
+                             <input className="choose-file" type="file" onChange={(e)=>this.fileInput(e)} />  
                              </form>
-                             <button type="button" className="btn btn-primary" data-dismiss="modal">confirm Image</button>
+                             <button type="button" className="btn btn-primary" data-dismiss="modal" onClick={this.saveImage}>confirm Image</button>
                         </div>
                     </div>
                 </div>    
